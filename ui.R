@@ -5,12 +5,12 @@ dashboardPage(
   dashboardHeader(title = "Auckland Rugby"),
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Dashboard", icon = icon("dashboard"),
+      menuItem("Match Performance", icon = icon("dashboard"),
         menuSubItem("Defence", tabName = "defence", icon = icon("shield-alt")),
         menuSubItem("Carries", tabName = "carries", icon = icon("football-ball")),
         menuSubItem("Breakdown", tabName = "breakdown", icon = icon("stop-circle"))),
-      menuItem("Athletes", tabName = "athlete", icon = icon("users")),
-      menuItem("Analytics", icon = icon("chart-bar"),
+      menuItem("Physical Capabilities", tabName = "athlete", icon = icon("users")),
+      menuItem("Correlation Analysis", icon = icon("chart-bar"),
         menuSubItem("Correlation-Defence", tabName = "CorDefence", icon = icon("shield-alt")),
         menuSubItem("Correlation-Carries", tabName = "CorCarries", icon = icon("football-ball")),
         menuSubItem("Correlation-Breakdown", tabName = "CorBreakdown", icon = icon("stop-circle"))),
