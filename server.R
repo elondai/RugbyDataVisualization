@@ -59,7 +59,7 @@ gg.gauge <- function(pos=0, value=0, min=0, max=100, title="", Date="", opposite
     max = unlist(max)
   }
   
-  if (is.na(pos))
+  if (all(is.na(pos)))
   {
     if (opposite)
     {
@@ -107,8 +107,11 @@ gg.gauge <- function(pos=0, value=0, min=0, max=100, title="", Date="", opposite
     {
       d.arrow = data.frame()
       for (i in 1:length(pos)){
-        temp = get.poly3(pos[i], 0.2, 0.85)
-        d.arrow = rbind(d.arrow, cbind(temp, Date[i]))
+        if (!is.na(pos[i]))
+        {
+          temp = get.poly3(pos[i], 0.2, 0.85)
+          d.arrow = rbind(d.arrow, cbind(temp, Date[i]))          
+        }
       }
       colnames(d.arrow)[3] = "Date"
       
@@ -135,8 +138,11 @@ gg.gauge <- function(pos=0, value=0, min=0, max=100, title="", Date="", opposite
     {
       d.arrow = data.frame()
       for (i in 1:length(pos)){
-        temp = get.poly2(pos[i], 0.2, 0.85)
-        d.arrow = rbind(d.arrow, cbind(temp, Date[i]))
+        if (!is.na(pos[i]))
+        {
+          temp = get.poly3(pos[i], 0.2, 0.85)
+          d.arrow = rbind(d.arrow, cbind(temp, Date[i]))          
+        }
       }
       colnames(d.arrow)[3] = "Date"
 
