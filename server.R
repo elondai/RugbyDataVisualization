@@ -508,4 +508,96 @@ server <- function(input, output, session) {
     corr = cor(df.CorBreakdown, use = "pairwise.complete.obs")
     corrplot(corr[1:8,-(1:8)], method="circle")
   })
+  
+  output$PlayerCountBox <- renderValueBox({
+    valueBox(
+      length(unique(df.playerprofiles$Player)), "Players", icon = icon("users"),
+      color = "orange"
+    )
+  })
+
+  output$TestingCountBox <- renderValueBox({
+    valueBox(
+      length(df.playerprofiles$Player), "Testing Results", icon = icon("file-alt"),
+      color = "purple"
+    )
+  })
+  
+  output$MatchCountBox <- renderValueBox({
+    
+    df.MatchList = rbind(unique(df.def.detail$MatchID1),
+                      unique(df.car.detail$MatchID1),
+                      unique(df.brk.detail$MatchID1))
+    
+    valueBox(
+      length(unique(df.MatchList)), "Matches", icon = icon("football-ball"),
+      color = "green"
+    )
+  })
+
+  output$CountPlayerTesting <- renderPlot({
+    ggplot(df.playerprofiles, aes(Position)) + 
+      geom_bar(fill = "darkorchid4") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  })
+  
+  output$CountPlayerMatches <- renderPlot({
+    df.PlayerMatches = as.data.frame(unique(rbind(cbind(df.def.detail$Player,df.def.detail$MatchID1),
+                                                  cbind(df.car.detail$Player,df.car.detail$MatchID1),
+                                                  cbind(df.brk.detail$Player,df.brk.detail$MatchID1))))
+    
+    ggplot(df.PlayerMatches, aes(V1)) + 
+      geom_bar(fill = "palegreen4") +
+      scale_x_discrete(name = "Player") + 
+      scale_y_continuous(breaks=seq(0,10000,by=1)) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  })
+  
+  output$CountNAsProfile <- renderPlot({
+    df.NAsCount = as.data.frame(sapply(df.playerprofiles, function(y) sum(length(which(is.na(y))))))
+    colnames(df.NAsCount) = c("Count")
+    
+    df.NAsCount = cbind(ColumnName = rownames(df.NAsCount), df.NAsCount)
+    
+    ggplot(df.NAsCount, aes(x=ColumnName, y=Count)) + 
+      geom_bar(stat="identity", fill = "grey30") + coord_flip() +
+      scale_y_continuous(expand = c(0,0)) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  })
+
+  output$CountNAsDefence <- renderPlot({
+    df.NAsCount = as.data.frame(sapply(df.def.detail, function(y) sum(length(which(is.na(y))))))
+    colnames(df.NAsCount) = c("Count")
+    
+    df.NAsCount = cbind(ColumnName = rownames(df.NAsCount), df.NAsCount)
+    
+    ggplot(df.NAsCount, aes(x=ColumnName, y=Count)) + 
+      geom_bar(stat="identity", fill = "grey30") + coord_flip() +
+      scale_y_continuous(expand = c(0,0)) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  })
+  
+  output$CountNAsCarries <- renderPlot({
+    df.NAsCount = as.data.frame(sapply(df.car.detail, function(y) sum(length(which(is.na(y))))))
+    colnames(df.NAsCount) = c("Count")
+    
+    df.NAsCount = cbind(ColumnName = rownames(df.NAsCount), df.NAsCount)
+    
+    ggplot(df.NAsCount, aes(x=ColumnName, y=Count)) + 
+      geom_bar(stat="identity", fill = "grey30") + coord_flip() +
+      scale_y_continuous(expand = c(0,0)) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  })
+  
+  output$CountNAsBreakdown <- renderPlot({
+    df.NAsCount = as.data.frame(sapply(df.brk.detail, function(y) sum(length(which(is.na(y))))))
+    colnames(df.NAsCount) = c("Count")
+    
+    df.NAsCount = cbind(ColumnName = rownames(df.NAsCount), df.NAsCount)
+    
+    ggplot(df.NAsCount, aes(x=ColumnName, y=Count)) + 
+      geom_bar(stat="identity", fill = "grey30") + coord_flip() +
+      scale_y_continuous(expand = c(0,0)) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  })
 }

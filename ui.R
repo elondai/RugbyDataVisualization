@@ -15,6 +15,7 @@ dashboardPage(
         menuSubItem("Correlation-Carries", tabName = "CorCarries", icon = icon("football-ball")),
         menuSubItem("Correlation-Breakdown", tabName = "CorBreakdown", icon = icon("stop-circle"))),
       menuItem("Rawdata", icon = icon("database"),
+               menuSubItem("Overview", tabName = "rawdata_overview", icon = icon("binoculars")),
                menuSubItem("DefenceData", tabName = "rawdata_defence", icon = icon("table")),
                menuSubItem("BreakdownData", tabName = "rawdata_breakdown", icon = icon("table")),
                menuSubItem("CarriesData", tabName = "rawdata_carries", icon = icon("table")),
@@ -131,6 +132,23 @@ dashboardPage(
               ),
               fluidRow(
                 box(title = "Correlation-Breakdown", status = "primary", solidHeader = T, width = 12, plotOutput("CorBreakdown", height="500px"))
+              )
+      ),
+      tabItem(tabName = "rawdata_overview",
+              fluidRow(
+                valueBoxOutput("PlayerCountBox"),
+                valueBoxOutput("TestingCountBox"),
+                valueBoxOutput("MatchCountBox")
+              ),
+              fluidRow(
+                box(title = "Position - Testing Results", status = "primary", solidHeader = T, width = 6, plotOutput("CountPlayerTesting")),
+                box(title = "Player - Matches", status = "primary", solidHeader = T, width = 6, plotOutput("CountPlayerMatches"))
+              ),
+              fluidRow(
+                box(title = "NAs - Profile Data", status = "primary", solidHeader = T, width = 3, plotOutput("CountNAsProfile")),
+                box(title = "NAs - Defence Data", status = "primary", solidHeader = T, width = 3, plotOutput("CountNAsDefence")),
+                box(title = "NAs - Carries Data", status = "primary", solidHeader = T, width = 3, plotOutput("CountNAsCarries")),
+                box(title = "NAs - Breakdown Data", status = "primary", solidHeader = T, width = 3, plotOutput("CountNAsBreakdown"))
               )
       ),
       tabItem(tabName = "rawdata_defence",
