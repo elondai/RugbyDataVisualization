@@ -141,8 +141,8 @@ dashboardPage(
                 valueBoxOutput("MatchCountBox")
               ),
               fluidRow(
-                box(title = "Position - Testing Results", status = "primary", solidHeader = T, width = 6, plotOutput("CountPlayerTesting")),
-                box(title = "Player - Matches", status = "primary", solidHeader = T, width = 6, plotOutput("CountPlayerMatches"))
+                box(title = "Position - The Number Of Testing Results", status = "primary", solidHeader = T, width = 6, plotOutput("CountPlayerTesting")),
+                box(title = "Player - The Number Of Matches", status = "primary", solidHeader = T, width = 6, plotOutput("CountPlayerMatches"))
               ),
               fluidRow(
                 box(title = "NAs - Profile Data", status = "primary", solidHeader = T, width = 3, plotOutput("CountNAsProfile")),

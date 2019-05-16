@@ -13,21 +13,7 @@ get.poly <- function(a,b,r1=0.5,r2=1.0) {
   return(data.frame(x,y))
 }
 
-get.poly2 <- function(a, r1=0.5,r2=1.0) {
-  th.start <- pi*(1-(a-0.3)/100)
-  th.end   <- pi*(1-(a+0.3)/100)
-  th       <- seq(th.start,th.end,length=100)
-  
-  th2.start <- pi*(1-(a-8)/100)
-  th2.end   <- pi*(1-(a+8)/100)
-  th2       <- seq(th2.start,th2.end,length=100)
-  
-  x        <- c(r1*cos(th2),rev(r2*cos(th)))
-  y        <- c(r1*sin(th2),rev(r2*sin(th)))
-  return(data.frame(x,y))
-}
-
-get.poly3 <- function(a, r1=0.5,r2=1.0) {
+get.poly4pointer <- function(a, r1=0.5,r2=1.0) {
   th.start <- pi*((a-0.3)/100)
   th.end   <- pi*((a+0.3)/100)
   th       <- seq(th.start,th.end,length=100)
@@ -66,11 +52,12 @@ gg.gauge <- function(pos=0, value=0, min=0, max=100, title="", Date="", opposite
       # for speed, the lower figure is the better
       ggplot() + 
         geom_polygon(data=get.poly(breaks[1],breaks[2]),aes(x,y),fill="OrangeRed")+
-        geom_polygon(data=get.poly(breaks[2],breaks[3]),aes(x,y),fill="Gold1")+
+        geom_polygon(data=get.poly(breaks[2],breaks[3]),aes(x,y),fill="Orange")+
         geom_polygon(data=get.poly(breaks[3],breaks[4]),aes(x,y),fill="SeaGreen")+
         annotate("text",x=0,y=0,label="NA",vjust=0,size=5,fontface="italic")+
-        annotate("text",x=0.75*cos(pi),y=0,label=max,vjust=-0.5,size=4,fontface="bold",col="white")+
-        annotate("text",x=-0.75*cos(pi),y=0,label=min,vjust=-0.5,size=4,fontface="bold",col="white")+
+        geom_text(data=as.data.frame(breaks), size=4, fontface="bold", vjust=-0.5, col="white",
+                  aes(x=0.75*cos(pi*(1-breaks/100)),y=0.75*sin(pi*(1-breaks/100)),
+                      label=round(max - breaks / 100 * (max - min), 2)))+ 
         coord_fixed()+
         theme_bw()+
         theme(axis.text=element_blank(),
@@ -85,11 +72,12 @@ gg.gauge <- function(pos=0, value=0, min=0, max=100, title="", Date="", opposite
     {
       ggplot() + 
         geom_polygon(data=get.poly(breaks[1],breaks[2]),aes(x,y),fill="OrangeRed")+
-        geom_polygon(data=get.poly(breaks[2],breaks[3]),aes(x,y),fill="Gold1")+
+        geom_polygon(data=get.poly(breaks[2],breaks[3]),aes(x,y),fill="Orange")+
         geom_polygon(data=get.poly(breaks[3],breaks[4]),aes(x,y),fill="SeaGreen")+
         annotate("text",x=0,y=0,label="NA",vjust=0,size=5,fontface="italic")+
-        annotate("text",x=0.75*cos(pi),y=0,label=min,vjust=-0.5,size=4,fontface="bold",col="white")+
-        annotate("text",x=-0.75*cos(pi),y=0,label=max,vjust=-0.5,size=4,fontface="bold",col="white")+
+        geom_text(data=as.data.frame(breaks), size=4, fontface="bold", vjust=-0.5, col="white",
+                  aes(x=0.75*cos(pi*(1-breaks/100)),y=0.75*sin(pi*(1-breaks/100)),
+                      label=round(max - breaks / 100 * (max - min), 2)))+ 
         coord_fixed()+
         theme_bw()+
         theme(axis.text=element_blank(),
@@ -109,7 +97,7 @@ gg.gauge <- function(pos=0, value=0, min=0, max=100, title="", Date="", opposite
       for (i in 1:length(pos)){
         if (!is.na(pos[i]))
         {
-          temp = get.poly3(pos[i], 0.2, 0.85)
+          temp = get.poly4pointer(pos[i], 0.2, 0.85)
           d.arrow = rbind(d.arrow, cbind(temp, Date[i]))          
         }
       }
@@ -117,12 +105,12 @@ gg.gauge <- function(pos=0, value=0, min=0, max=100, title="", Date="", opposite
       
       ggplot() + 
         geom_polygon(data=get.poly(breaks[1],breaks[2]),aes(x,y),fill="OrangeRed")+
-        geom_polygon(data=get.poly(breaks[2],breaks[3]),aes(x,y),fill="Gold1")+
+        geom_polygon(data=get.poly(breaks[2],breaks[3]),aes(x,y),fill="Orange")+
         geom_polygon(data=get.poly(breaks[3],breaks[4]),aes(x,y),fill="SeaGreen")+
         geom_polygon(data=d.arrow, aes(x,y,group=Date,fill=Date), col="grey30")+
-        #annotate("text",x=0,y=0,label=value,vjust=0,size=4,fontface="bold",col="red")+
-        annotate("text",x=0.75*cos(pi),y=0,label=max,vjust=-0.5,size=4,fontface="bold",col="white")+
-        annotate("text",x=-0.75*cos(pi),y=0,label=min,vjust=-0.5,size=4,fontface="bold",col="white")+
+        geom_text(data=as.data.frame(breaks), size=4, fontface="bold", vjust=-0.5, col="white",
+                  aes(x=0.75*cos(pi*(1-breaks/100)),y=0.95*sin(pi*(1-breaks/100)),
+                      label=round(max - breaks / 100 * (max - min), 2)))+ 
         coord_fixed()+
         theme_bw()+
         theme(axis.text=element_blank(),
@@ -140,7 +128,7 @@ gg.gauge <- function(pos=0, value=0, min=0, max=100, title="", Date="", opposite
       for (i in 1:length(pos)){
         if (!is.na(pos[i]))
         {
-          temp = get.poly3(pos[i], 0.2, 0.85)
+          temp = get.poly4pointer(pos[i], 0.2, 0.85)
           d.arrow = rbind(d.arrow, cbind(temp, Date[i]))          
         }
       }
@@ -148,10 +136,11 @@ gg.gauge <- function(pos=0, value=0, min=0, max=100, title="", Date="", opposite
 
       ggplot() + 
         geom_polygon(data=get.poly(breaks[1],breaks[2]),aes(x,y),fill="OrangeRed")+
-        geom_polygon(data=get.poly(breaks[2],breaks[3]),aes(x,y),fill="Gold1")+
+        geom_polygon(data=get.poly(breaks[2],breaks[3]),aes(x,y),fill="Orange")+
         geom_polygon(data=get.poly(breaks[3],breaks[4]),aes(x,y),fill="SeaGreen")+
-        annotate("text",x=0.75*cos(pi),y=0,label=min,vjust=-0.5,size=4,fontface="bold",col="white")+
-        annotate("text",x=-0.75*cos(pi),y=0,label=max,vjust=-0.5,size=4,fontface="bold",col="white")+
+        geom_text(data=as.data.frame(breaks), size=4, fontface="bold", vjust=-0.5, col="white",
+                  aes(x=0.75*cos(pi*(1-breaks/100)),y=0.9*sin(pi*(1-breaks/100)),
+                      label=round(min + breaks / 100 * (max - min), 2)))+
         geom_polygon(data=d.arrow, aes(x,y,group=Date,fill=Date), col="grey30")+
         #annotate("text",x=0,y=0,label=value,vjust=0,size=4,fontface="bold",col="red")+        
         coord_fixed()+
@@ -194,10 +183,10 @@ server <- function(input, output, session) {
     if (input$chk_defence){
       df.def.display$Y = round(df.def.display$Y / df.def.display$Z, digit = 2)
     }
-    ggplot(data=df.def.display, aes(x=reorder(X, Y), y=Y)) + 
+    ggplot(data=df.def.display, aes(x=reorder(X, Y), y=Y, fill=Y)) + 
       scale_x_discrete(name = "Player", expand = c(0,0)) + 
       scale_y_discrete(name = input$sel_defence, expand = c(0,0)) +
-      geom_bar(stat="identity", fill="steelblue") + coord_flip() + 
+      geom_bar(stat="identity") + coord_flip() + 
       geom_text(aes(label=Y), hjust=1.2, color="white", size=2.5) 
   })
   
@@ -209,9 +198,9 @@ server <- function(input, output, session) {
       df.def.display$Y = round(df.def.display$Y / df.def.display$Z, digit = 2)
     }
     
-    ggplot(data=df.def.display, aes(x=X, y=Y)) + 
-      geom_boxplot(color = "#0072B2", fill = "steelblue") + 
-      theme(axis.text.x = element_text(angle = 70, hjust = 1, vjust = 1)) +
+    ggplot(data=df.def.display, aes(x=X, y=Y, fill=X)) + 
+      geom_boxplot() + 
+      theme(axis.text.x = element_text(angle = 70, hjust = 1, vjust = 1), legend.position = "none") +
       scale_x_discrete(name = "Position", expand = c(0,0)) + 
       scale_y_continuous(name = input$sel_defence)
   })
@@ -223,10 +212,10 @@ server <- function(input, output, session) {
     if (input$chk_carries){
       df.car.display$Y = round(df.car.display$Y / df.car.display$Z, digit = 2)
     }
-    ggplot(data=df.car.display, aes(x=reorder(X, Y), y=Y)) + 
+    ggplot(data=df.car.display, aes(x=reorder(X, Y), y=Y, fill=Y)) + 
       scale_x_discrete(name = "Player", expand = c(0,0)) + 
       scale_y_discrete(name = input$sel_carries, expand = c(0,0)) +
-      geom_bar(stat="identity", fill="steelblue") + coord_flip() + 
+      geom_bar(stat="identity") + coord_flip() + 
       geom_text(aes(label=Y), hjust=1.2, color="white", size=2.5) 
   })
   
@@ -238,9 +227,9 @@ server <- function(input, output, session) {
       df.car.display$Y = round(df.car.display$Y / df.car.display$Z, digit = 2)
     }
     
-    ggplot(data=df.car.display, aes(x=X, y=Y)) + 
-      geom_boxplot(color = "#0072B2", fill = "steelblue") + 
-      theme(axis.text.x = element_text(angle = 70, hjust = 1, vjust = 1)) +
+    ggplot(data=df.car.display, aes(x=X, y=Y, fill=X)) + 
+      geom_boxplot() + 
+      theme(axis.text.x = element_text(angle = 70, hjust = 1, vjust = 1), legend.position = "none") +
       scale_x_discrete(name = "Position", expand = c(0,0)) + 
       scale_y_continuous(name = input$sel_carries)
   })
@@ -252,10 +241,10 @@ server <- function(input, output, session) {
     if (input$chk_breakdown){
       df.brk.display$Y = round(df.brk.display$Y / df.brk.display$Z, digit = 2)
     }
-    ggplot(data=df.brk.display, aes(x=reorder(X, Y), y=Y)) + 
+    ggplot(data=df.brk.display, aes(x=reorder(X, Y), y=Y, fill=Y)) + 
       scale_x_discrete(name = "Player", expand = c(0,0)) + 
       scale_y_discrete(name = input$sel_breakdown, expand = c(0,0)) +
-      geom_bar(stat="identity", fill="steelblue") + coord_flip() + 
+      geom_bar(stat="identity") + coord_flip() + 
       geom_text(aes(label=Y), hjust=1.2, color="white", size=2.5) 
   })
 
@@ -267,9 +256,9 @@ server <- function(input, output, session) {
       df.brk.display$Y = round(df.brk.display$Y / df.brk.display$Z, digit = 2)
     }
     
-    ggplot(data=df.brk.display, aes(x=X, y=Y)) + 
-      geom_boxplot(color = "#0072B2", fill = "steelblue") + 
-      theme(axis.text.x = element_text(angle = 70, hjust = 1, vjust = 1)) +
+    ggplot(data=df.brk.display, aes(x=X, y=Y, fill=X)) + 
+      geom_boxplot() + 
+      theme(axis.text.x = element_text(angle = 70, hjust = 1, vjust = 1), legend.position = "none") +
       scale_x_discrete(name = "Position", expand = c(0,0)) + 
       scale_y_continuous(name = input$sel_breakdown)
   })
