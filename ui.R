@@ -6,20 +6,20 @@ dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Match Performance", icon = icon("dashboard"),
-        menuSubItem("Defence", tabName = "defence", icon = icon("shield-alt")),
-        menuSubItem("Carries", tabName = "carries", icon = icon("football-ball")),
-        menuSubItem("Breakdown", tabName = "breakdown", icon = icon("stop-circle"))),
+              menuSubItem("Defence", tabName = "defence", icon = icon("shield-alt")),
+              menuSubItem("Carries", tabName = "carries", icon = icon("football-ball")),
+              menuSubItem("Breakdown", tabName = "breakdown", icon = icon("stop-circle"))),
       menuItem("Physical Capabilities", tabName = "athlete", icon = icon("users")),
       menuItem("Correlation Analysis", icon = icon("chart-bar"),
-        menuSubItem("Correlation-Defence", tabName = "CorDefence", icon = icon("shield-alt")),
-        menuSubItem("Correlation-Carries", tabName = "CorCarries", icon = icon("football-ball")),
-        menuSubItem("Correlation-Breakdown", tabName = "CorBreakdown", icon = icon("stop-circle"))),
-      menuItem("Rawdata", icon = icon("database"),
-               menuSubItem("Overview", tabName = "rawdata_overview", icon = icon("binoculars")),
-               menuSubItem("DefenceData", tabName = "rawdata_defence", icon = icon("table")),
-               menuSubItem("BreakdownData", tabName = "rawdata_breakdown", icon = icon("table")),
-               menuSubItem("CarriesData", tabName = "rawdata_carries", icon = icon("table")),
-               menuSubItem("ProfileData", tabName = "rawdata_profile", icon = icon("table")))
+              menuSubItem("Correlation-Defence", tabName = "CorDefence", icon = icon("shield-alt")),
+              menuSubItem("Correlation-Carries", tabName = "CorCarries", icon = icon("football-ball")),
+              menuSubItem("Correlation-Breakdown", tabName = "CorBreakdown", icon = icon("stop-circle"))),
+      menuItem("Raw Data", icon = icon("database"),
+              menuSubItem("Overview", tabName = "rawdata_overview", icon = icon("binoculars")),
+              menuSubItem("DefenceData", tabName = "rawdata_defence", icon = icon("table")),
+              menuSubItem("BreakdownData", tabName = "rawdata_breakdown", icon = icon("table")),
+              menuSubItem("CarriesData", tabName = "rawdata_carries", icon = icon("table")),
+              menuSubItem("ProfileData", tabName = "rawdata_profile", icon = icon("table")))
     ),
     tags$div(a(href = 'http://www.aucklandrugby.co.nz/',
               img(src = 'logo.png',
@@ -90,10 +90,10 @@ dashboardPage(
                 )
               ),
               fluidRow(
-                box(title = "Anthropometric", status = "primary", solidHeader = T, width = 6, plotOutput("Anthropometric")),
-                box(title = "YoYo Bronco", status = "primary", solidHeader = T, width = 6, plotOutput("YoYo")),
-                box(title = "Upper Strength", status = "primary", solidHeader = T, width = 6, plotOutput("Strength_Upper")),
-                box(title = "Lower Strength", status = "primary", solidHeader = T, width = 6, plotOutput("Strength_Lower")),
+                box(title = "Anthropometric", status = "primary", solidHeader = T, width = 6, plotOutput("Anthropometric", height="150px")),
+                box(title = "YoYo Bronco", status = "primary", solidHeader = T, width = 6, plotOutput("YoYo", height="150px")),
+                box(title = "Upper Strength", status = "primary", solidHeader = T, width = 6, plotOutput("Strength_Upper", height="260px")),
+                box(title = "Lower Strength", status = "primary", solidHeader = T, width = 6, plotOutput("Strength_Lower", height="260px")),
                 box(title = "Power", status = "primary", solidHeader = T, width = 6, plotOutput("Power")),
                 box(title = "Speed", status = "primary", solidHeader = T, width = 6, plotOutput("Speed"))
               )

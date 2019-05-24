@@ -1,182 +1,9 @@
 library(shiny)
 library(shinydashboard)
-library(ggplot2)
-library(gridExtra)
-library(corrplot)
-
-get.poly <- function(a,b,r1=0.5,r2=1.0) {
-  th.start <- pi*(1-a/100)
-  th.end   <- pi*(1-b/100)
-  th       <- seq(th.start,th.end,length=100)
-  x        <- c(r1*cos(th),rev(r2*cos(th)))
-  y        <- c(r1*sin(th),rev(r2*sin(th)))
-  return(data.frame(x,y))
-}
-
-get.poly4pointer <- function(a, r1=0.5,r2=1.0) {
-  th.start <- pi*((a-0.3)/100)
-  th.end   <- pi*((a+0.3)/100)
-  th       <- seq(th.start,th.end,length=100)
-  
-  th2.start <- pi*((a-8)/100)
-  th2.end   <- pi*((a+8)/100)
-  th2       <- seq(th2.start,th2.end,length=100)
-  
-  x        <- c(r1*cos(th2),rev(r2*cos(th)))
-  y        <- c(r1*sin(th2),rev(r2*sin(th)))
-  return(data.frame(x,y))
-}
-
-gg.gauge <- function(pos=0, value=0, min=0, max=100, title="", Date="", opposite=0, breaks=c(0,30,70,100)) {
-  if (is.list(pos))
-  {
-    pos = unlist(pos)
-  }
-  if (is.list(value))
-  {
-    value = unlist(value)
-  }
-  if (is.list(min))
-  {
-    min = unlist(min)
-  }
-  if (is.list(max))
-  {
-    max = unlist(max)
-  }
-  
-  if (all(is.na(pos)))
-  {
-    if (opposite)
-    {
-      # for speed, the lower figure is the better
-      ggplot() + 
-        geom_polygon(data=get.poly(breaks[1],breaks[2]),aes(x,y),fill="OrangeRed")+
-        geom_polygon(data=get.poly(breaks[2],breaks[3]),aes(x,y),fill="Orange")+
-        geom_polygon(data=get.poly(breaks[3],breaks[4]),aes(x,y),fill="SeaGreen")+
-        annotate("text",x=0,y=0,label="NA",vjust=0,size=5,fontface="italic")+
-        geom_text(data=as.data.frame(breaks), size=4, fontface="bold", vjust=-0.5, col="white",
-                  aes(x=0.75*cos(pi*(1-breaks/100)),y=0.75*sin(pi*(1-breaks/100)),
-                      label=round(max - breaks / 100 * (max - min), 2)))+ 
-        coord_fixed()+
-        theme_bw()+
-        theme(axis.text=element_blank(),
-              axis.title=element_blank(),
-              axis.ticks=element_blank(),
-              panel.grid=element_blank(),
-              panel.border=element_blank(),
-              plot.title = element_text(hjust = 0.5, size=15, face="bold.italic"))+
-        labs(title=title)      
-    }
-    else
-    {
-      ggplot() + 
-        geom_polygon(data=get.poly(breaks[1],breaks[2]),aes(x,y),fill="OrangeRed")+
-        geom_polygon(data=get.poly(breaks[2],breaks[3]),aes(x,y),fill="Orange")+
-        geom_polygon(data=get.poly(breaks[3],breaks[4]),aes(x,y),fill="SeaGreen")+
-        annotate("text",x=0,y=0,label="NA",vjust=0,size=5,fontface="italic")+
-        geom_text(data=as.data.frame(breaks), size=4, fontface="bold", vjust=-0.5, col="white",
-                  aes(x=0.75*cos(pi*(1-breaks/100)),y=0.75*sin(pi*(1-breaks/100)),
-                      label=round(max - breaks / 100 * (max - min), 2)))+ 
-        coord_fixed()+
-        theme_bw()+
-        theme(axis.text=element_blank(),
-              axis.title=element_blank(),
-              axis.ticks=element_blank(),
-              panel.grid=element_blank(),
-              panel.border=element_blank(),
-              plot.title = element_text(hjust = 0.5, size=15, face="bold.italic"))+
-        labs(title=title)      
-    }
-  }
-  else
-  {
-    if(opposite)
-    {
-      d.arrow = data.frame()
-      for (i in 1:length(pos)){
-        if (!is.na(pos[i]))
-        {
-          temp = get.poly4pointer(pos[i], 0.2, 0.85)
-          d.arrow = rbind(d.arrow, cbind(temp, Date[i]))          
-        }
-      }
-      colnames(d.arrow)[3] = "Date"
-      
-      ggplot() + 
-        geom_polygon(data=get.poly(breaks[1],breaks[2]),aes(x,y),fill="OrangeRed")+
-        geom_polygon(data=get.poly(breaks[2],breaks[3]),aes(x,y),fill="Orange")+
-        geom_polygon(data=get.poly(breaks[3],breaks[4]),aes(x,y),fill="SeaGreen")+
-        geom_polygon(data=d.arrow, aes(x,y,group=Date,fill=Date), col="grey30")+
-        geom_text(data=as.data.frame(breaks), size=4, fontface="bold", vjust=-0.5, col="white",
-                  aes(x=0.75*cos(pi*(1-breaks/100)),y=0.95*sin(pi*(1-breaks/100)),
-                      label=round(max - breaks / 100 * (max - min), 2)))+ 
-        coord_fixed()+
-        theme_bw()+
-        theme(axis.text=element_blank(),
-              axis.title=element_blank(),
-              axis.ticks=element_blank(),
-              panel.grid=element_blank(),
-              panel.border=element_blank(),
-              legend.position = "none",
-              plot.title = element_text(hjust = 0.5, size=15, face="bold.italic"))+
-        labs(title=title)         
-    }
-    else
-    {
-      d.arrow = data.frame()
-      for (i in 1:length(pos)){
-        if (!is.na(pos[i]))
-        {
-          temp = get.poly4pointer(pos[i], 0.2, 0.85)
-          d.arrow = rbind(d.arrow, cbind(temp, Date[i]))          
-        }
-      }
-      colnames(d.arrow)[3] = "Date"
-
-      ggplot() + 
-        geom_polygon(data=get.poly(breaks[1],breaks[2]),aes(x,y),fill="OrangeRed")+
-        geom_polygon(data=get.poly(breaks[2],breaks[3]),aes(x,y),fill="Orange")+
-        geom_polygon(data=get.poly(breaks[3],breaks[4]),aes(x,y),fill="SeaGreen")+
-        geom_text(data=as.data.frame(breaks), size=4, fontface="bold", vjust=-0.5, col="white",
-                  aes(x=0.75*cos(pi*(1-breaks/100)),y=0.9*sin(pi*(1-breaks/100)),
-                      label=round(min + breaks / 100 * (max - min), 2)))+
-        geom_polygon(data=d.arrow, aes(x,y,group=Date,fill=Date), col="grey30")+
-        #annotate("text",x=0,y=0,label=value,vjust=0,size=4,fontface="bold",col="red")+        
-        coord_fixed()+
-        theme_bw()+
-        theme(axis.text=element_blank(),
-              axis.title=element_blank(),
-              axis.ticks=element_blank(),
-              panel.grid=element_blank(),
-              panel.border=element_blank(),
-              legend.position = "none",
-              plot.title = element_text(hjust = 0.5, size=15, face="bold.italic"))+
-        labs(title=title)         
-    }
-  }
-
-}
-
-f.get_value4gauge <- function(x, y) {
-  v.min = min(x, na.rm = T)
-  v.max = max(x, na.rm = T)
-  v.value = y
-
-  if (v.max == v.min)
-  {
-    v.percent = 100
-  }
-  else
-  {
-    v.percent = ((v.value - v.min) / (v.max - v.min)) * 100
-  }
-  
-  return(list(v.min, v.max, v.value, v.percent))
-}
 
 server <- function(input, output, session) {
-  # Plot Defence
+  ################# Match Pefromance #################
+  # Defence
   output$DefenceRanking <- renderPlot({
     df.def.display = df.def.overall[, c("Player", input$sel_defence, "MinutesTotal")]
     colnames(df.def.display) = c("X", "Y", "Z")
@@ -187,7 +14,8 @@ server <- function(input, output, session) {
       scale_x_discrete(name = "Player", expand = c(0,0)) + 
       scale_y_discrete(name = input$sel_defence, expand = c(0,0)) +
       geom_bar(stat="identity") + coord_flip() + 
-      geom_text(aes(label=Y), hjust=1.2, color="white", size=2.5) 
+      geom_text(aes(label=Y), hjust=1.2, color="white", size=2.5) +
+      theme(legend.title = element_blank(), axis.text = element_text(size = 10))
   })
   
   output$DefencePosition <- renderPlot({
@@ -200,12 +28,12 @@ server <- function(input, output, session) {
     
     ggplot(data=df.def.display, aes(x=X, y=Y, fill=X)) + 
       geom_boxplot() + 
-      theme(axis.text.x = element_text(angle = 70, hjust = 1, vjust = 1), legend.position = "none") +
+      theme(axis.text.x = element_text(angle = 70, hjust = 1, vjust = 1, size = 12), legend.position = "none") +
       scale_x_discrete(name = "Position", expand = c(0,0)) + 
       scale_y_continuous(name = input$sel_defence)
   })
 
-  # Plot Carries
+  # Carries
   output$CarriesRanking <- renderPlot({
     df.car.display = df.car.overall[, c("Player", input$sel_carries, "MinutesTotal")]
     colnames(df.car.display) = c("X", "Y", "Z")
@@ -216,7 +44,8 @@ server <- function(input, output, session) {
       scale_x_discrete(name = "Player", expand = c(0,0)) + 
       scale_y_discrete(name = input$sel_carries, expand = c(0,0)) +
       geom_bar(stat="identity") + coord_flip() + 
-      geom_text(aes(label=Y), hjust=1.2, color="white", size=2.5) 
+      geom_text(aes(label=Y), hjust=1.2, color="white", size=2.5) +
+      theme(legend.title = element_blank(), axis.text = element_text(size = 10))
   })
   
   output$CarriesPosition <- renderPlot({
@@ -229,12 +58,12 @@ server <- function(input, output, session) {
     
     ggplot(data=df.car.display, aes(x=X, y=Y, fill=X)) + 
       geom_boxplot() + 
-      theme(axis.text.x = element_text(angle = 70, hjust = 1, vjust = 1), legend.position = "none") +
+      theme(axis.text.x = element_text(angle = 70, hjust = 1, vjust = 1, size = 12), legend.position = "none") +
       scale_x_discrete(name = "Position", expand = c(0,0)) + 
       scale_y_continuous(name = input$sel_carries)
   })
   
-  # Plot Breakdown
+  # Breakdown
   output$BreakdownRanking <- renderPlot({
     df.brk.display = df.brk.overall[, c("Player", input$sel_breakdown, "MinutesTotal")]
     colnames(df.brk.display) = c("X", "Y", "Z")
@@ -245,7 +74,8 @@ server <- function(input, output, session) {
       scale_x_discrete(name = "Player", expand = c(0,0)) + 
       scale_y_discrete(name = input$sel_breakdown, expand = c(0,0)) +
       geom_bar(stat="identity") + coord_flip() + 
-      geom_text(aes(label=Y), hjust=1.2, color="white", size=2.5) 
+      geom_text(aes(label=Y), hjust=1.2, color="white", size=2.5) +
+      theme(legend.title = element_blank(), axis.text = element_text(size = 10))
   })
 
   output$BreakdownPosition <- renderPlot({
@@ -258,11 +88,12 @@ server <- function(input, output, session) {
     
     ggplot(data=df.brk.display, aes(x=X, y=Y, fill=X)) + 
       geom_boxplot() + 
-      theme(axis.text.x = element_text(angle = 70, hjust = 1, vjust = 1), legend.position = "none") +
+      theme(axis.text.x = element_text(angle = 70, hjust = 1, vjust = 1, size = 12), legend.position = "none") +
       scale_x_discrete(name = "Position", expand = c(0,0)) + 
       scale_y_continuous(name = input$sel_breakdown)
   })
 
+  ################# Physical Capabilities #################
   output$Anthropometric <- renderPlot({
     datarange = as.Date(input$dateRange, "%d/%m/%y")
     df.player.display = df.playerprofiles[which(df.playerprofiles$Player == input$sel_player &
@@ -281,7 +112,7 @@ server <- function(input, output, session) {
 
     nLen = nrow(df.player.display)
     df.player.display = df.player.display[order(df.player.display$BW), ]
-    BW = f.get_value4gauge(df.pos.display$BW, df.player.display$BW)
+    BW = get.value4gauge(df.pos.display$BW, df.player.display$BW)
     d.BW = data.frame(x1 = c(1, 1 + 5 * unlist(BW[4])[-nLen] / 100),
                       x2 = 1 + 5 * unlist(BW[4]) / 100,
                       y1 = 1.3,
@@ -290,7 +121,7 @@ server <- function(input, output, session) {
                       Date = df.player.display$Date)
     
     df.player.display = df.player.display[order(df.player.display$BodyFatsumof8mm), ]
-    BF = f.get_value4gauge(df.pos.display$BodyFatsumof8mm, df.player.display$BodyFatsumof8mm)
+    BF = get.value4gauge(df.pos.display$BodyFatsumof8mm, df.player.display$BodyFatsumof8mm)
     d.BF = data.frame(x1 = c(1, 1 + 5 * unlist(BF[4])[-nLen] / 100),
                       x2 = 1 + 5 * unlist(BF[4]) / 100,
                       y1 = 1,
@@ -304,15 +135,15 @@ server <- function(input, output, session) {
     
     ggplot() + 
       geom_rect(data=d, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), color="black", alpha=0.5) +
-      geom_text(data=d, aes(x=x1, y=y1 - 0.03, label=minValue), size=4) +
-      geom_text(data=d, aes(x=x2, y=y1 - 0.03, label=maxValue), size=4) +
+      geom_text(data=d, aes(x=x1, y=y1 - 0.05, label=minValue), size=4) +
+      geom_text(data=d, aes(x=x2, y=y1 - 0.05, label=maxValue), size=4) +
       geom_text(data=d, aes(x=3.5, y=y2[2] + 0.1, label="Body Weight"), size=5) +
       geom_text(data=d, aes(x=3.5, y=y2[1] + 0.1, label="Body Fat(Sum of 8) "), size=5) +
       geom_rect(data=d.BW, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2, fill=Date), color="black", alpha=0.5) +
-      geom_text(data=d.BW, aes(x=x2, y=rep(c(1.27,1.37), len=nLen), label=Value), size=4) +
+      geom_text(data=d.BW, aes(x=x2, y=rep(c(1.25,1.4), len=nLen), label=Value), size=4) +
       geom_point(data=d.BW, aes(x=x2, y=1.3 - 0.01, fill=Date), shape=24, size=4) +
       geom_rect(data=d.BF, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2, fill=Date), color="black", alpha=0.5) +
-      geom_text(data=d.BF, aes(x=x2, y=rep(c(0.97,1.07), len=nLen), label=Value), size=4) +
+      geom_text(data=d.BF, aes(x=x2, y=rep(c(0.95,1.1), len=nLen), label=Value), size=4) +
       geom_point(data=d.BF, aes(x=x2, y=1 - 0.01, fill=Date), shape=24, size=4) +
       theme(panel.grid = element_blank(),
             panel.background = element_blank(), 
@@ -333,8 +164,8 @@ server <- function(input, output, session) {
                                                as.Date(df.playerprofiles$Date, "%d/%m/%y") <= datarange[2]),
                                        c(1, 4, 30:31)]
     
-    YOYO = f.get_value4gauge(df.pos.display$YoYoScore, df.player.display$YoYoScore)
-    BRONCO = f.get_value4gauge(df.pos.display$BroncoTime, df.player.display$BroncoTime)
+    YOYO = get.value4gauge(df.pos.display$YoYoScore, df.player.display$YoYoScore)
+    BRONCO = get.value4gauge(df.pos.display$BroncoTime, df.player.display$BroncoTime)
     
     
     grid.arrange(arrangeGrob(gg.gauge(YOYO[4], YOYO[3], YOYO[1], YOYO[2], "YoYo Score", df.player.display$Date),
@@ -355,10 +186,10 @@ server <- function(input, output, session) {
                                                as.Date(df.playerprofiles$Date, "%d/%m/%y") <= datarange[2]),
                                        c(1, 4, 7:10)]
     
-    BP = f.get_value4gauge(df.pos.display$BenchPress, df.player.display$BenchPress)
-    DBP = f.get_value4gauge(df.pos.display$DBPress, df.player.display$DBPress)
-    BOR = f.get_value4gauge(df.pos.display$BentOverRow, df.player.display$BentOverRow)
-    WC = f.get_value4gauge(df.pos.display$WeightedChin, df.player.display$WeightedChin)
+    BP = get.value4gauge(df.pos.display$BenchPress, df.player.display$BenchPress)
+    DBP = get.value4gauge(df.pos.display$DBPress, df.player.display$DBPress)
+    BOR = get.value4gauge(df.pos.display$BentOverRow, df.player.display$BentOverRow)
+    WC = get.value4gauge(df.pos.display$WeightedChin, df.player.display$WeightedChin)
     
     
     grid.arrange(arrangeGrob(gg.gauge(BP[4], BP[3], BP[1], BP[2], "BenchPress", df.player.display$Date),
@@ -380,12 +211,12 @@ server <- function(input, output, session) {
                                                as.Date(df.playerprofiles$Date, "%d/%m/%y") <= datarange[2]),
                                        c(1, 4, 11:16)]
 
-    Squat = f.get_value4gauge(df.pos.display$Squat, df.player.display$Squat)
-    FS = f.get_value4gauge(df.pos.display$FrontSquat, df.player.display$FrontSquat)
-    TBDL = f.get_value4gauge(df.pos.display$TrapBarDeadlift, df.player.display$TrapBarDeadlift)
-    SU = f.get_value4gauge(df.pos.display$StepUp, df.player.display$StepUp)
-    HT = f.get_value4gauge(df.pos.display$HipThrust, df.player.display$HipThrust)
-    HTOB = f.get_value4gauge(df.pos.display$HipThrustOffBench, df.player.display$HipThrustOffBench)
+    Squat = get.value4gauge(df.pos.display$Squat, df.player.display$Squat)
+    FS = get.value4gauge(df.pos.display$FrontSquat, df.player.display$FrontSquat)
+    TBDL = get.value4gauge(df.pos.display$TrapBarDeadlift, df.player.display$TrapBarDeadlift)
+    SU = get.value4gauge(df.pos.display$StepUp, df.player.display$StepUp)
+    HT = get.value4gauge(df.pos.display$HipThrust, df.player.display$HipThrust)
+    HTOB = get.value4gauge(df.pos.display$HipThrustOffBench, df.player.display$HipThrustOffBench)
 
     grid.arrange(arrangeGrob(gg.gauge(Squat[4], Squat[3], Squat[1], Squat[2], "Squat", df.player.display$Date),
                              gg.gauge(FS[4], FS[3], FS[1], FS[2], "FrontSquat", df.player.display$Date),
@@ -408,15 +239,15 @@ server <- function(input, output, session) {
                                                as.Date(df.playerprofiles$Date, "%d/%m/%y") <= datarange[2]),
                                        c(1, 4, 17:25)]    
     
-    PC = f.get_value4gauge(df.pos.display$PowerClean, df.player.display$PowerClean)
-    HC = f.get_value4gauge(df.pos.display$HangClean, df.player.display$HangClean)
-    MC = f.get_value4gauge(df.pos.display$MuscleClean, df.player.display$MuscleClean)
-    X20KG = f.get_value4gauge(df.pos.display$X20kg, df.player.display$X20kg)
-    X30kg = f.get_value4gauge(df.pos.display$X30kg, df.player.display$X30kg)
-    X40kg = f.get_value4gauge(df.pos.display$X40kg, df.player.display$X40kg)
-    X60kg = f.get_value4gauge(df.pos.display$X60kg, df.player.display$X60kg)
-    X80kg = f.get_value4gauge(df.pos.display$X80kg, df.player.display$X80kg)
-    X100kg = f.get_value4gauge(df.pos.display$X100kg, df.player.display$X100kg)
+    PC = get.value4gauge(df.pos.display$PowerClean, df.player.display$PowerClean)
+    HC = get.value4gauge(df.pos.display$HangClean, df.player.display$HangClean)
+    MC = get.value4gauge(df.pos.display$MuscleClean, df.player.display$MuscleClean)
+    X20KG = get.value4gauge(df.pos.display$X20kg, df.player.display$X20kg)
+    X30kg = get.value4gauge(df.pos.display$X30kg, df.player.display$X30kg)
+    X40kg = get.value4gauge(df.pos.display$X40kg, df.player.display$X40kg)
+    X60kg = get.value4gauge(df.pos.display$X60kg, df.player.display$X60kg)
+    X80kg = get.value4gauge(df.pos.display$X80kg, df.player.display$X80kg)
+    X100kg = get.value4gauge(df.pos.display$X100kg, df.player.display$X100kg)
 
     grid.arrange(arrangeGrob(gg.gauge(PC[4], PC[3], PC[1], PC[2], "PowerClean", df.player.display$Date),
                              gg.gauge(HC[4], HC[3], HC[1], HC[2], "HangClean", df.player.display$Date),
@@ -442,10 +273,10 @@ server <- function(input, output, session) {
                                                as.Date(df.playerprofiles$Date, "%d/%m/%y") <= datarange[2]),
                                        c(1, 4, 26:29)]    
     
-    X10m = f.get_value4gauge(df.pos.display$X10m, df.player.display$X10m)
-    X20m = f.get_value4gauge(df.pos.display$X20m, df.player.display$X20m)
-    X30m = f.get_value4gauge(df.pos.display$X30m, df.player.display$X30m)
-    X40m = f.get_value4gauge(df.pos.display$X40m, df.player.display$X40m)
+    X10m = get.value4gauge(df.pos.display$X10m, df.player.display$X10m)
+    X20m = get.value4gauge(df.pos.display$X20m, df.player.display$X20m)
+    X30m = get.value4gauge(df.pos.display$X30m, df.player.display$X30m)
+    X40m = get.value4gauge(df.pos.display$X40m, df.player.display$X40m)
 
     grid.arrange(arrangeGrob(gg.gauge(X10m[4], X10m[3], X10m[1], X10m[2], "Rolling Speed 10m",
                                       df.player.display$Date, opposite = 1),
@@ -458,13 +289,7 @@ server <- function(input, output, session) {
                              ncol=2))
   })
   
-  # Rawdata
-  output$DefenceTable <- renderDataTable({df.defence}, options = list(scrollX = TRUE))
-  output$BreakdownTable <- renderDataTable({df.breakdown}, options = list(scrollX = TRUE))
-  output$CarriesTable <- renderDataTable({df.carries}, options = list(scrollX = TRUE))
-  output$ProfileTable <- renderDataTable({df.playerprofiles}, options = list(scrollX = TRUE))
-  
-  # Analytics
+  ################# Correlation Analysis #################
   output$CorDefence <- renderPlot({
     if (input$sel_positon_cordef != "ALL")
     {
@@ -498,6 +323,8 @@ server <- function(input, output, session) {
     corrplot(corr[1:8,-(1:8)], method="circle")
   })
   
+  ################# Rawdata #################
+  # Overview
   output$PlayerCountBox <- renderValueBox({
     valueBox(
       length(unique(df.playerprofiles$Player)), "Players", icon = icon("users"),
@@ -589,4 +416,10 @@ server <- function(input, output, session) {
       scale_y_continuous(expand = c(0,0)) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
   })
+
+  # Display raw data through Data Table
+  output$DefenceTable <- renderDataTable({df.defence}, options = list(scrollX = TRUE))
+  output$BreakdownTable <- renderDataTable({df.breakdown}, options = list(scrollX = TRUE))
+  output$CarriesTable <- renderDataTable({df.carries}, options = list(scrollX = TRUE))
+  output$ProfileTable <- renderDataTable({df.playerprofiles}, options = list(scrollX = TRUE))
 }
